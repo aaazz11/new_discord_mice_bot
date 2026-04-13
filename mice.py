@@ -60,25 +60,28 @@ async def on_ready():
         if channel:
             await channel.send("# 起司:cheese:")
 #TARGET_CHANNEL_ID = 123456789012345678  # 改成你的頻道ID
-
 @bot.event
 async def on_guild_join(guild):
-    channel = discord.utils.get(await guild.text_channels, name="留友看勞鼠")
+    # 修正處：直接使用 guild.text_channels，不要加 await
+    channel = discord.utils.get(guild.text_channels, name="留友看勞鼠")
+    
     if channel is None:
         try:
             # 建立文字頻道
             channel = await guild.create_text_channel("留友看勞鼠")
-
             # 傳送訊息
-            await channel.send("# 起司:cheese:")
-
+            await channel.send("# 起司 :cheese:")
             print(f"已在 {guild.name} 建立頻道")
-
+        except discord.Forbidden:
+            print(f"在 {guild.name} 建立頻道失敗：機器人缺乏『管理頻道』權限")
         except Exception as e:
             print(f"建立頻道失敗：{e}")
     else:
-        await channel.send("# 起司:cheese:")
-            
+        # 如果頻道已存在，直接發送訊息
+        try:
+            await channel.send("# 起司 :cheese:")
+        except Exception as e:
+            print(f"發送訊息失敗：{e}")
 
 @bot.event
 async def on_message(message):
@@ -103,9 +106,7 @@ async def on_message(message):
         #await message.channel.send(f'{member.name}已被設定超時時間，將在{minutes}分鐘後解除超時。')
 
     await bot.process_commands(message)
-
-
-# 在檔案最後面
+    
 if __name__ == "__main__":
     keep_alive()  # 啟動網頁伺服器
     if TOKEN:
