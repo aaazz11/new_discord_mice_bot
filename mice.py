@@ -19,8 +19,9 @@ def home():
     return "Bot is alive!"
 
 def run():
-    # Render 會給一個 Port，預設通常是 10000
-    app.run(host='0.0.0.0', port=8080)
+    # 優先讀取 Render 給予的 Port，如果沒有則用 10000 (Render 預設)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
 
 def keep_alive():
     t = Thread(target=run)
@@ -102,20 +103,6 @@ async def on_message(message):
         #await message.channel.send(f'{member.name}已被設定超時時間，將在{minutes}分鐘後解除超時。')
 
     await bot.process_commands(message)
-# @client.event
-# 當頻道有新訊息
-# async def on_message(message: discord.Message):
-#     # 排除機器人本身的訊息，避免無限循環
-#     if message.author == client.user:
-#         return
-#     # 新訊息包含Hello，回覆Hello, world!
-#     if message.channel.name == "留友看勞鼠":
-#         await message.channel.send(embed=discord.Embed(
-#             title= "勞鼠",
-#             description= f"{message.author} 是可愛的小勞鼠",
-#         ))
-#         gif_url = "https://klipy.com/gifs/-24579" 
-#         await message.channel.send(gif_url)
 
 
 # 在檔案最後面
