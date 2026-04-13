@@ -70,14 +70,14 @@ async def on_guild_join(guild):
             channel = await guild.create_text_channel("留友看勞鼠")
 
             # 傳送訊息
-            await channel.send("#起司:cheese:")
+            await channel.send("# 起司:cheese:")
 
             print(f"已在 {guild.name} 建立頻道")
 
         except Exception as e:
             print(f"建立頻道失敗：{e}")
     else:
-        await channel.send("#起司:cheese:")
+        await channel.send("# 起司:cheese:")
             
 
 @bot.event
@@ -89,7 +89,7 @@ async def on_message(message):
         print(f"{message.guild.name} {message.author}: {message.content}")
         await message.channel.send(embed=discord.Embed(
             title= "勞鼠\n",
-            description= f"{message.author} 是可愛的小勞鼠",
+            description= f"{message.author.mention} 是可愛的小勞鼠",
             color=discord.Colour.random(),
         ))
         gif_url = "https://klipy.com/gifs/-24579" 
