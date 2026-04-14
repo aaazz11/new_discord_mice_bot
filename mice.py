@@ -153,7 +153,13 @@ async def on_message(message):
             await message.author.timeout(duration)
         except:
             await message.channel.send("# 羨慕了好大的官威")
-
+    else:
+        if message.content == "勞鼠":
+            await message.channel.send("吱吱")
+        if message.content == "老鼠":
+            await message.channel.send("你才老鼠")
+        if message.content == "mice" or message.content == "mouse" :
+            await message.channel.send("ん？(要素察覺")
     await bot.process_commands(message)
 
 # --- 啟動 ---
