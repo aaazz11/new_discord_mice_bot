@@ -5,6 +5,7 @@ import datetime
 from flask import Flask
 from threading import Thread
 import os
+import aiohttp
 from dotenv import load_dotenv # 如果你在本地測試，建議安裝 python-dotenv
 
 # 讀取環境變數
@@ -26,7 +27,39 @@ def run():
 def keep_alive():
     t = Thread(target=run)
     t.start()
+# ... 之前的 Flask 和 keep_alive 程式碼保持不變 ...
 
+class MyBot(commands.Bot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    async def setup_hook(self):
+        # 啟動自動 Ping 任務
+        self.auto_ping.start()
+
+    # 每 10 分鐘執行一次 (Render 免費版是 15 分鐘沒流量會休眠)
+    @tasks.loop(minutes=10)
+    async def auto_ping(self):
+        # 這裡填入你 Render 部署後得到的網址 (例如 https://xxx.onrender.com)
+        url = os.environ.get("https://new-discord-mice-bot.onrender.com") 
+        if not url:
+            # 如果環境變數沒抓到，可以手動寫死網址 (不建議但最簡單)
+            # url = "https://你的專案名稱.onrender.com"
+            return
+
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        print(f"自補給成功！狀態碼: {response.status}")
+                    else:
+                        print(f"自補給異常，狀態碼: {response.status}")
+            except Exception as e:
+                print(f"Ping 自己時發生錯誤: {e}")
+
+    @auto_ping.before_loop
+    async def before_ping(self):
+        await self.wait_until_ready()
 
 intents = discord.Intents.default()
 intents.message_content = True  # 必開
@@ -53,6 +86,13 @@ async def unmute(interaction: discord.Interaction, member: discord.Member):
 
 @bot.event
 async def on_ready():
+    channel = discord.utils.get(guild.text_channels, name="留友看勞鼠")
+    if channel is None:
+        try:
+            # 建立文字頻道
+            channel = await guild.create_text_channel("留友看勞鼠")
+        except discord.Forbidden:
+            print(f"在 {guild.name} 建立頻道失敗：機器人缺乏『管理頻道』權限")
     await bot.tree.sync()  # 同步 slash 指令
     print(f"已登入：{bot.user}")
     for guild in bot.guilds:  # 遍歷每一個伺服器
