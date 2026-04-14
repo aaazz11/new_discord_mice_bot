@@ -78,13 +78,34 @@ async def unmute(interaction: discord.Interaction, member: discord.Member):
 @bot.event
 async def on_ready():
     print(f"已登入：{bot.user}")
+    
+    # 遍歷機器人加入的所有伺服器
     for guild in bot.guilds:
+        # 檢查該伺服器是否已經有名為「留友看勞鼠」的頻道
         channel = discord.utils.get(guild.text_channels, name="留友看勞鼠")
-        if channel:
+        
+        if channel is None:
+            try:
+                # 如果找不到，就創建一個
+                channel = await guild.create_text_channel("留友看勞鼠")
+                await channel.send("# 起司 :cheese:")
+                print(f"成功在 {guild.name} 補建頻道")
+            except discord.Forbidden:
+                print(f"在 {guild.name} 權限不足，無法補建頻道")
+            except Exception as e:
+                print(f"在 {guild.name} 發生錯誤：{e}")
+        else:
+            # 如果頻道已經存在，可以選擇要不要補發訊息（選配）
             try:
                 await channel.send("# 起司 :cheese:")
+                print(f"{guild.name} 的頻道已存在，跳過建立")
             except:
                 pass
+
+    # 最後同步 Slash 指令
+    await bot.tree.sync()
+    print("所有伺服器頻道檢查完畢，Slash 指令已同步！")
+
 
 @bot.event
 async def on_guild_join(guild):
