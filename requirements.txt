@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 discord.py
 flask
 python-dotenv
 aiohttp
+=======
+discord.py
+flask
+python-dotenv
+aiohttp
+>>>>>>> e702d7d (first commit)
