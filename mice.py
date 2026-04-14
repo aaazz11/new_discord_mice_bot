@@ -70,6 +70,7 @@ async def unmute(interaction: discord.Interaction, member: discord.Member):
     try:
         await member.timeout(None)
         await interaction.response.send_message(f"{interaction.user.mention} 已拯救 {member.mention} 的言論自由")
+        await member.edit(nick=None)
     except discord.Forbidden:
         await interaction.response.send_message("官位不夠大 請前往儲值口充值")
     except Exception:
